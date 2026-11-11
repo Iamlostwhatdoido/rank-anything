@@ -1,0 +1,23 @@
+import numpy as np
+
+DATA_PATH = "/collections"
+IMAGE_PATH = "/image"
+UNKNOWN_FILE_PATH = "./modules/unknown.png"
+SAVE_FILE = "/save.tsv"
+
+DEFAULT_SCORE = 0
+DEFAULT_DOUBT = 400
+MINIMUM_DOUBT = 30
+SURPRISE_FACTOR = (DEFAULT_DOUBT**2 - MINIMUM_DOUBT**2)/5
+
+STANDARD_GAP = 400
+EXPECTANCY_BASE = 9
+
+MATCH_AREA_WIDTH = 1000
+MATCH_AREA_HEIGHT = 400
+
+STANDARD_CONTESTANTS_NUMBERS = {}
+for n in range(2,30):
+	rows = round(np.sqrt(n/(MATCH_AREA_WIDTH/MATCH_AREA_HEIGHT)))
+	if not n%rows:
+		STANDARD_CONTESTANTS_NUMBERS[str(n)] = (rows,n//rows)
