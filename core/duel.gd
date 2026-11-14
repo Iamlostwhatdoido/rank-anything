@@ -35,3 +35,18 @@ func _init(
 	fighter_a = input_fighter_a
 	fighter_b = input_fighter_b
 	duel_result = input_duel_result
+
+
+## Checks if the duel contains the fighter.
+func has(fighter: Sortable) -> bool:
+	return (fighter == fighter_a) or (fighter == fighter_b)
+
+
+## Returns the duel result, from the pov of a given fighter.
+func get_result_of(fighter: Sortable) -> float:
+	assert(has(fighter), "The fighter must be in the duel")
+	
+	if fighter == fighter_a:
+		return duel_result
+	else:
+		return 1.0 - duel_result
