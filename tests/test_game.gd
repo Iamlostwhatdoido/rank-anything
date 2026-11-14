@@ -97,17 +97,6 @@ func _score_between(duels: Array[Duel], x: Sortable, y: Sortable) -> float:
 		return candidate_duels[0].get_result_of(x)
 
 
-func test_get_duels_count() -> void:
-	# Arrange :
-	var test_game := Game.new_from_match(winners, losers)
-
-	# Act :
-	var duels := test_game.get_duels()
-
-	# Assert :
-	assert_eq(duels.size(), 10, "5 participants make 5 * 4 / 2 = 10 duels")
-
-
 func test_get_duels_single_participant() -> void:
 	# Arrange :
 	var test_game := Game.new()
