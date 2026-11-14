@@ -77,3 +77,76 @@ func test_no_losers() -> void:
 	assert_has(grouped_rankings.keys(), 1, "There are winners")
 	assert_does_not_have(grouped_rankings.keys(), 2, "There are no losers")
 	assert_eq(grouped_rankings.size(), 1, "Only one rank")
+
+
+## Score of the duel between x and y, seen from x, whichever side x is on in the Duel.
+## Fails the test (fail_test) and returns -1.0 if there is no duel between x and y.
+func _score_between(duels: Array[Duel], x: Sortable, y: Sortable) -> float:
+	var candidate_duels: Array[Duel] = []
+	for duel in duels:
+		if duel.has(x) and duel.has(y):
+			candidate_duels.append(duel)
+	
+	if candidate_duels.is_empty():
+		fail_test("No duel found between %s and %s" % [x.name, y.name])
+		return -1.0
+	elif candidate_duels.size() > 1:
+		fail_test("Multiple duels found between %s and %s" % [x.name, y.name])
+		return -1.0
+	else:
+		return candidate_duels[0].get_result_of(x)
+
+
+func test_get_duels_count() -> void:
+	# Arrange :
+	var test_game := Game.new_from_match(winners, losers)
+
+	# Act :
+	var duels := test_game.get_duels()
+
+	# Assert :
+	assert_eq(duels.size(), 10, "5 participants make 5 * 4 / 2 = 10 duels")
+
+
+func test_get_duels_single_participant() -> void:
+	# Arrange :
+	var test_game := Game.new()
+	test_game.add_ranking(win1, 1)
+
+	# Act / Assert :
+	assert_eq(test_game.get_duels().size(), 0, "A lone participant has no duel")
+
+
+func test_get_duels_empty_game() -> void:
+	# Arrange / Act / Assert :
+	assert_eq(Game.new().get_duels().size(), 0, "An empty game has no duel")
+
+
+func test_get_duels_scores() -> void:
+	# Arrange :
+	var test_game := Game.new_from_match(winners, losers)
+
+	# Act :
+	var duels := test_game.get_duels()
+
+	# Assert :
+	assert_eq(_score_between(duels, win1, los1), 1.0, "Winner 1 beats Loser 1")
+	assert_eq(_score_between(duels, los2, win3), 0.0, "Loser 2 loses to Winner 3")
+	assert_eq(_score_between(duels, win1, win2), 0.5, "Two winners draw")
+	assert_eq(_score_between(duels, los1, los2), 0.5, "Two losers draw")
+
+
+func test_get_duels_every_pair_once() -> void:
+	# Arrange :
+	var test_game := Game.new_from_match(winners, losers)
+	var participants: Array[Sortable] = [win1, win2, win3, los1, los2]
+
+	# Act :
+	var duels := test_game.get_duels()
+
+	# Assert : with exactly 10 duels, finding all 10 pairs proves none is missing or doubled.
+	assert_eq(duels.size(), 10, "10 duels")
+	for i in participants.size():
+		for j in range(i + 1, participants.size()):
+			assert_ne(_score_between(duels, participants[i], participants[j]), -1.0,
+				"%s and %s have a duel" % [participants[i].name, participants[j].name])

@@ -33,3 +33,20 @@ func group_by_rank() -> Dictionary[int, Array]:
 		rank_population.append(participant)
 
 	return grouped_by_rank
+
+
+func get_duels() -> Array[Duel]:
+	var duel_list: Array[Duel] = []
+	
+	var fighter_list = rankings.keys()
+	
+	for a_id in range(fighter_list.size()):
+		var fighter_a: Sortable = fighter_list[a_id]
+		
+		for b_id in range(a_id+1, fighter_list.size()):
+			var fighter_b: Sortable = fighter_list[b_id]
+			
+			var new_duel := Duel.new_from_rank(fighter_a, rankings[fighter_a], fighter_b, rankings[fighter_b])
+			duel_list.append(new_duel)
+	
+	return duel_list
