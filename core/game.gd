@@ -1,4 +1,4 @@
-## Stores results of a game, tiering participants by ranks.
+## Stores results of a game, tiering Sortables by ranks.
 class_name Game
 extends RefCounted
 
