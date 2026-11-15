@@ -138,3 +138,19 @@ static func _find_bound_b(
 		push_warning("Volatility: Bound B search did not converge after %d iterations" % MAX_ITERATIONS)
 		return NAN
 	return a - k * tau
+
+
+## Step 6 of Glickman's paper: φ*
+static func prerating_period_phi(phi: float, new_volatility: float) -> float:
+	return sqrt(phi ** 2 + new_volatility ** 2)
+
+
+## Step 7 of Glickman's paper: φ'
+static func new_phi(prerating_phi: float, computed_variance: float) -> float:
+	return 1 / sqrt(1 / prerating_phi ** 2 + 1 / computed_variance)
+
+
+## Step 7 of Glickman's paper: μ'
+## Note: it does use the partial sum needed for 'improvement()', not improvement itself.
+static func new_mu(mu: float, computed_new_phi: float, sum_improvement_impacts: float) -> float:
+	return mu + computed_new_phi ** 2 * sum_improvement_impacts

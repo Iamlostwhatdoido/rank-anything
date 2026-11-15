@@ -93,7 +93,22 @@ func test_volatility() -> void:
 			main_fighter.volatility, PAPER_PHI, PAPER_VARIANCE, PAPER_IMPROVEMENT, OFFICIAL_TAU)
 	assert_almost_eq(new_volatility, PAPER_NEW_VOLATILITY, 0.00001)
 
-# TODO : extend to step 6 & 7
+
+func test_prerating_period_phi() -> void:
+	var prerating_phi := Glicko2.prerating_period_phi(PAPER_PHI, PAPER_NEW_VOLATILITY)
+	assert_almost_eq(prerating_phi, PAPER_PRERATING_PHI, 0.000001)
+
+
+func test_new_phi() -> void:
+	var new_phi := Glicko2.new_phi(PAPER_PRERATING_PHI, PAPER_VARIANCE)
+	assert_almost_eq(new_phi, PAPER_NEW_PHI, 0.0001)
+
+
+func test_new_mu() -> void:
+	# The paper does not publish the raw sum: found through improvement / variance.
+	var paper_sum_improvement_impacts := PAPER_IMPROVEMENT / PAPER_VARIANCE
+	var new_mu := Glicko2.new_mu(main_fighter.mu, PAPER_NEW_PHI, paper_sum_improvement_impacts)
+	assert_almost_eq(new_mu, PAPER_NEW_MU, 0.001)
 
 
 # --- END-TO-END CHAIN ---
@@ -105,9 +120,14 @@ func test_full_chain() -> void:
 	
 	var new_volatility := Glicko2.volatility(
 			main_fighter.volatility, main_fighter.phi, variance, improvement, OFFICIAL_TAU)
+	var prerating_phi := Glicko2.prerating_period_phi(main_fighter.phi, new_volatility)
+	var new_phi := Glicko2.new_phi(prerating_phi, variance)
+	var new_mu := Glicko2.new_mu(main_fighter.mu, new_phi, sum_improvement_impacts)
 	
+	# Assert : full precision drifts from the paper's rounded chain, hence 0.001.
 	assert_almost_eq(new_volatility, PAPER_NEW_VOLATILITY, 0.00001, "sigma'")
-	# TODO : extend to step 6 & 7
+	assert_almost_eq(new_phi, PAPER_NEW_PHI, 0.001, "phi'")
+	assert_almost_eq(new_mu, PAPER_NEW_MU, 0.001, "mu'")
 
 
 # --- CONVERSION TESTS ---
